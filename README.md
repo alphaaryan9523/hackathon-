@@ -1,1 +1,1 @@
-#AI Based Inventory System
+AI Based Inventory System
