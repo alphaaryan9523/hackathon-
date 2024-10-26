@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Styles and HTML structure as before -->
+</head>
+<body>
+    <div class="container">
+        <!-- HTML structure as before -->
+
+        <h2>Inventory Forecasting</h2>
+        <button onclick="generateForecast()">Generate Forecast</button>
+        <ul id="forecastList"></ul>
+    </div>
+
+    <script>
+        const apiUrl = 'http://127.0.0.1:5000/inventory';
+        const forecastUrl = 'http://127.0.0.1:5000/predict_demand';
+
+        async function generateForecast() {
+            try {
+                // Fetch historical data from inventory
+                const response = await fetch(apiUrl);
+                const inventory = await response.json();
+
+                // Get quantity data for prediction
+                const historicalData = inventory.map(item => item.quantity);
+
+                // Request prediction
+                const forecastResponse = await fetch(forecastUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ historical_data: historicalData })
+                });
+
+                const prediction = await forecastResponse.json();
+                displayForecast(prediction.forecast);
+            } catch (error) {
+                console.error('Error generating forecast:', error);
+            }
+        }
+
+        function displayForecast(forecastData) {
+            const forecastList = document.getElementById('forecastList');
+            forecastList.innerHTML = '';
+            forecastData.forEach((value, index) => {
+                const li = document.createElement('li');
+                li.textContent = `Day ${index + 1}: Forecasted Demand - ${Math.round(value)}`;
+                forecastList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
